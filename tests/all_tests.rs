@@ -1,14 +1,13 @@
 mod infra;
 
-// Your tests go here!
 success_tests! {
-    add1: "73",
-    add: "15",
-    nested_arith: "25",
-    binding: "5",
+    add: "add.snek",
+    add1: "add1.snek",
+    binding: "binding.snek",
+    nested_arith: "nested_arith.snek",
 }
 
 failure_tests! {
-    unbound_id: "Unbound variable identifier x",
-    duplicate_binding: "Duplicate binding",
+    duplicate_binding: "duplicate_binding.snek",
+    unbound_id: "unbound_id.snek",
 }
