@@ -1,4 +1,4 @@
-use crate::lib::{Expr, Instr, Op1, Op2, Reg, Val};
+use boa::{Expr, Instr, Op1, Op2, Reg, Val};
 use im::HashMap;
 
 pub fn compile_to_instrs(expr: &Expr) -> Vec<Instr> {
@@ -80,6 +80,7 @@ pub fn instr_to_str(i: &Instr) -> String {
         Instr::IMov(dest, src) => format!("mov {}, {}", val_to_str(dest), val_to_str(src)),
         Instr::IAdd(dest, src) => format!("add {}, {}", val_to_str(dest), val_to_str(src)),
         Instr::ISub(dest, src) => format!("sub {}, {}", val_to_str(dest), val_to_str(src)),
+        Instr::IMul(dest, src) => format!("imul {}, {}", val_to_str(dest), val_to_str(src)),
     }
 }
 

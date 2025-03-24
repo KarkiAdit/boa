@@ -1,13 +1,18 @@
 use sexp::{Sexp, Atom::*};
-use crate::lib::{Expr, Op1, Op2};
+use boa::{Expr, Op1, Op2};
 
 pub fn parse(source: &str) -> Expr {
-    let parsed = sexp::parse(source)
-        .expect("Invalid S-expression")
-        .into_iter()
-        .next()
-        .expect("Expected at least one expression");
-    parse_expr(&parsed)
+    let parsed = sexp::parse(source).expect("Invalid S-expression");
+
+    match parsed {
+        Sexp::List(mut exprs) => {
+            if exprs.len() != 1 {
+                panic!("Expected exactly one expression");
+            }
+            parse_expr(&exprs.remove(0))
+        }
+        _ => panic!("Expected top-level list of expressions"),
+    }
 }
 
 pub fn parse_expr(s: &Sexp) -> Expr {

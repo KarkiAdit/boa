@@ -1,5 +1,3 @@
-use im::HashMap;
-
 #[derive(Debug)]
 pub enum Val {
     Reg(Reg),
@@ -18,6 +16,7 @@ pub enum Instr {
     IMov(Val, Val),
     IAdd(Val, Val),
     ISub(Val, Val),
+    IMul(Val, Val),
 }
 
 #[derive(Debug)]

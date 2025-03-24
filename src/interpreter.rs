@@ -1,4 +1,4 @@
-use crate::lib::{Expr, Op1, Op2};
+use boa::{Expr, Op1, Op2};
 use im::HashMap;
 
 pub fn eval(expr: &Expr) -> i32 {
@@ -33,13 +33,13 @@ fn eval_expr(expr: &Expr, env: &HashMap<String, i32>) -> i32 {
         }
 
         Expr::Let(bindings, body) => {
-            let mut new_env = env.clone();
+            let mut new_env: HashMap<String, i32> = env.clone();
             for (name, val_expr) in bindings {
                 let val = eval_expr(val_expr, &new_env);
                 if new_env.contains_key(name) {
                     panic!("Duplicate binding");
                 }
-                new_env.insert(name.clone(), val);
+                new_env = new_env.update(name.clone(), val);
             }
             eval_expr(body, &new_env)
         }
