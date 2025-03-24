@@ -1,62 +1,42 @@
+mod parser;
+mod compiler;
+mod interpreter;
+mod lib;
+
 use std::env;
 use std::fs::File;
 use std::io::prelude::*;
 
-use sexp::Atom::*;
-use sexp::*;
-
-use im::HashMap;
-
-#[derive(Debug)]
-enum Val {
-    Reg(Reg),
-    Imm(i32),
-    RegOffset(Reg, i32),
-}
-
-#[derive(Debug)]
-enum Reg {
-    RAX,
-    RSP,
-}
-
-#[derive(Debug)]
-enum Instr {
-    IMov(Val, Val),
-    IAdd(Val, Val),
-    ISub(Val, Val),
-}
-
-#[derive(Debug)]
-enum Op1 {
-    Add1,
-    Sub1,
-}
-
-#[derive(Debug)]
-enum Op2 {
-    Plus,
-    Minus,
-    Times,
-}
-
-#[derive(Debug)]
-enum Expr {
-    Number(i32),
-    Id(String),
-    Let(Vec<(String, Expr)>, Box<Expr>),
-    UnOp(Op1, Box<Expr>),
-    BinOp(Op2, Box<Expr>, Box<Expr>),
-}
+use parser::parse;
+use compiler::{compile_to_instrs, instr_to_str};
+use interpreter::eval;
 
 fn main() -> std::io::Result<()> {
     let args: Vec<String> = env::args().collect();
 
-    let in_name = &args[1];
-    let out_name = &args[2];
+    if args.len() < 2 {
+        eprintln!("Usage: {} <input.snek> <output.s> [--interpret]", args[0]);
+        std::process::exit(1);
+    }
 
-    // You will make result hold the result of actually compiling
-    let result = "mov rax, 131";
+    let in_name = &args[1];
+    let contents = std::fs::read_to_string(in_name).expect("Failed to read input file");
+    let expr = parse(&contents);
+
+    // If --interpret flag is passed, just evaluate the result and print
+    if args.len() > 3 && args[3] == "--interpret" {
+        let result = eval(&expr);
+        println!("{}", result);
+        return Ok(());
+    }
+
+    let out_name = &args[2];
+    let instrs = compile_to_instrs(&expr);
+    let result = instrs
+        .iter()
+        .map(instr_to_str)
+        .collect::<Vec<_>>()
+        .join("\n  ");
 
     let asm_program = format!(
         "
