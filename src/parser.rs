@@ -1,5 +1,5 @@
 use sexp::{Sexp, Atom::*};
-use crate::{Expr, Op1, Op2};
+use crate::lib::{Expr, Op1, Op2};
 
 pub fn parse(source: &str) -> Expr {
     let parsed = sexp::parse(source)
@@ -12,14 +12,8 @@ pub fn parse(source: &str) -> Expr {
 
 pub fn parse_expr(s: &Sexp) -> Expr {
     match s {
-        Sexp::Atom(I(n)) => {
-            // Integer literal
-            Expr::Number(*n as i32)
-        }
-        Sexp::Atom(S(s)) => {
-            // Identifier
-            Expr::Id(s.clone())
-        }
+        Sexp::Atom(I(n)) => Expr::Number(*n as i32),
+        Sexp::Atom(S(s)) => Expr::Id(s.clone()),
         Sexp::List(list) => {
             if list.is_empty() {
                 panic!("Invalid: empty list");
@@ -58,7 +52,6 @@ pub fn parse_expr(s: &Sexp) -> Expr {
                             panic!("Invalid: let must have bindings and a body");
                         }
 
-                        // First parse the bindings list
                         let bindings_list = match &list[1] {
                             Sexp::List(v) => v,
                             _ => panic!("Invalid: expected binding list"),
@@ -100,7 +93,6 @@ pub fn parse_bind(s: &Sexp) -> (String, Expr) {
                 _ => panic!("Invalid: binding name must be identifier"),
             };
 
-            // Reserved keywords that shouldn't be used as variable names
             let reserved = ["let", "add1", "sub1", "+", "-", "*"];
             if reserved.contains(&name.as_str()) {
                 panic!("Invalid: '{}' is a reserved keyword", name);
